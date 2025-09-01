@@ -73,6 +73,81 @@ Or use FastMCP's automatic installation:
 fastmcp install claude-desktop server.py --server-name "Project Tracker"
 ```
 
+### Configuring with Claude Code
+
+To use this MCP server with Claude Code (Anthropic's official CLI):
+
+1. **Install Claude Code** (if you haven't already):
+   ```bash
+   # Install via pip
+   pip install claude-code
+   
+   # Or using uv
+   uv tool install claude-code
+   ```
+
+2. **Add MCP server to Claude Code configuration**:
+   
+   Create or edit your Claude Code MCP configuration file:
+   ```bash
+   # Create the config directory if it doesn't exist
+   mkdir -p ~/.claude
+   
+   # Edit the MCP config file
+   nano ~/.claude/mcp_servers.json
+   ```
+
+3. **Add this server configuration**:
+   ```json
+   {
+     "project-tracker": {
+       "command": "python",
+       "args": ["/absolute/path/to/project-tracking-mcp/server.py", "--mcp-only"],
+       "env": {}
+     }
+   }
+   ```
+
+4. **Update the path** in the configuration to point to your actual installation directory:
+   ```json
+   {
+     "project-tracker": {
+       "command": "python",
+       "args": ["/home/yourusername/project-tracking-mcp/server.py", "--mcp-only"],
+       "env": {}
+     }
+   }
+   ```
+
+5. **Verify the installation**:
+   ```bash
+   # Test that Claude Code can connect to the server
+   claude-code --list-tools
+   ```
+   
+   You should see the project tracking tools listed:
+   - `list_projects`
+   - `create_project` 
+   - `get_project`
+   - `delete_project`
+   - `create_task`
+   - `update_task_status`
+   - `delete_task`
+   - `get_project_stats`
+
+6. **Start using with Claude Code**:
+   ```bash
+   # Start Claude Code session
+   claude-code
+   
+   # Now you can use project tracking commands like:
+   # "Create a new project called 'My Web App'"
+   # "Add a task to implement user authentication"
+   # "Show me all my projects and their tasks"
+   ```
+
+**Note**: The `--mcp-only` flag ensures the server runs in MCP mode without starting the HTTP web interface, which is optimal for Claude Code integration.
+
 ## Available MCP Tools
 
 ### Project Management
