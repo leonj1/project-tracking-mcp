@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="project-detail">
+    <div class="project-header">
+        <div class="project-info">
+            <h1>{{ project.name }}</h1>
+            <p class="project-description">{{ project.description or "No description" }}</p>
+            <div class="project-meta">
+                <span>Created: {{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                {% if project.updated_at != project.created_at %}
+                <span>Updated: {{ project.updated_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="project-actions">
+            <a href="/" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="tasks-section">
+        <div class="section-header">
+            <h2>Tasks ({{ project.tasks | length }})</h2>
+            <div class="task-filters">
+                <button class="filter-btn active" data-status="all">All</button>
+                <button class="filter-btn" data-status="backlog">Backlog</button>
+                <button class="filter-btn" data-status="in_progress">In Progress</button>
+                <button class="filter-btn" data-status="review">Review</button>
+                <button class="filter-btn" data-status="complete">Complete</button>
+            </div>
+        </div>
+        
+        {% if project.tasks %}
+        <div class="tasks-container">
+            {% for task in project.tasks %}
+            <div class="task-card card" data-status="{{ task.status }}">
+                <div class="task-header">
+                    <div class="task-info">
+                        <h3 class="task-description">{{ task.description }}</h3>
+                        <div class="task-meta">
+                            <span class="task-category">{{ task.category }}</span>
+                            <span class="task-date">{{ task.created_at.strftime('%Y-%m-%d') }}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <select class="status-select" data-task-id="{{ task.id }}">
+                            <option value="backlog" {% if task.status == 'backlog' %}selected{% endif %}>Backlog</option>
+                            <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                            <option value="review" {% if task.status == 'review' %}selected{% endif %}>Review</option>
+                            <option value="complete" {% if task.status == 'complete' %}selected{% endif %}>Complete</option>
+                        </select>
+                        <span class="status status-{{ task.status }}">{{ task.status.replace('_', ' ').title() }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-tasks">
+            <p>No tasks in this project yet.</p>
+            <p>Use the MCP interface or API to create tasks.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.project-info h1 {
+    font-size: 2.25rem;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.project-description {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.project-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.task-filters {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.task-card {
+    transition: all 0.2s;
+}
+
+.task-card.hidden {
+    display: none;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-description {
+    font-size: 1.125rem;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.task-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.task-category {
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.empty-tasks {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .project-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .task-filters {
+        flex-wrap: wrap;
+    }
+    
+    .task-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .task-actions {
+        align-self: flex-start;
+    }
+}
+</style>
+
+<script>
+// Task filtering
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Filter tasks
+        const status = btn.dataset.status;
+        document.querySelectorAll('.task-card').forEach(card => {
+            if (status === 'all' || card.dataset.status === status) {
+                card.classList.remove('hidden');
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+    });
+});
+
+// Status updates
+document.querySelectorAll('.status-select').forEach(select => {
+    select.addEventListener('change', async (e) => {
+        const taskId = select.dataset.taskId;
+        const newStatus = select.value;
+        
+        try {
+            const response = await fetch(`/api/task/${taskId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newStatus)
+            });
+            
+            if (response.ok) {
+                // Update the visual status indicator
+                const taskCard = select.closest('.task-card');
+                const statusSpan = taskCard.querySelector('.status');
+                taskCard.dataset.status = newStatus;
+                statusSpan.className = `status status-${newStatus}`;
+                statusSpan.textContent = newStatus.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                // Show success feedback
+                showNotification('Task status updated successfully', 'success');
+            } else {
+                throw new Error('Failed to update task status');
+            }
+        } catch (error) {
+            console.error('Error updating task status:', error);
+            showNotification('Failed to update task status', 'error');
+            // Revert the select value
+            select.value = taskCard.dataset.status;
+        }
+    });
+});
+
+// Simple notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 4px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        transition: all 0.3s;
+        ${type === 'success' ? 'background: #10b981;' : ''}
+        ${type === 'error' ? 'background: #ef4444;' : ''}
+        ${type === 'info' ? 'background: #3b82f6;' : ''}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %}
